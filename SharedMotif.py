@@ -18,18 +18,17 @@ def ParseSeqstoList(inputfasta):
             idlist.append(record.id)
     return Seqlist
 
-seqslist = ParseSeqstoList(terminalinput1)
+#seqslist = ParseSeqstoList(terminalinput1)
 
 
 #Method using overlap graph and substring finding algorithms from previous exercises
 
-sizes = [len(rec) for rec in SeqIO.parse(terminalinput1, "fasta")]
-k = int(statistics.mean(sizes)/2)
+#sizes = [len(rec) for rec in SeqIO.parse(terminalinput1, "fasta")]
+#k = int(statistics.mean(sizes)/2)
 
 
 def Overlap(seq1,seq2):
     overlap = []
-    z=0
     #loop through the first sequence
     for x in range(len(seq1)):
         #loop through second sequence
@@ -127,10 +126,91 @@ def Combo(Seqslist, overlapsize):
 
     return(Seqslist)
 
-print(*Combo(seqslist, k))
+#print(*Combo(seqslist, k))
 
-def shortestCommon(Seqslist):
+seqslist = ParseSeqstoList(terminalinput1)
 
+def Commonsubs(seq1,seq2):
+    possibleoverlaps=[]
+    ##
+    for x in range(len(seq1)):
+        #print("searching from",x)
+        for y in range(len(seq2)):
+            #print('search at',y)
+            currentoverlap=[]
+            if seq1[x]==seq2[y]:
+                #print('found a match')
+                currentoverlap.append(seq1[x])
+                yy=y+1
+                for z in range(x+1,len(seq1)):
+
+                    if yy>=len(seq2)-1:
+                        currentoverlap.append(seq1[z])
+                        #print('reached end of sequence2')
+                        break
+                    if seq1[z]!=seq2[yy]:
+                        possibleoverlaps.append(''.join(currentoverlap))
+                        break
+                    #print(yy)
+                    #print(seq1[z],seq2[yy])
+                    if seq1[z]==seq2[yy]:
+                        currentoverlap.append(seq1[z])
+                        yy+=1
+    if len(possibleoverlaps) > 1:
+        biggestoverlap = max(len(possible) for possible in possibleoverlaps)
+        biggest = list(set([possible for possible in possibleoverlaps if len(possible)==biggestoverlap]))
+    else:
+        biggest = ['']
+    return [possible for possible in possibleoverlaps if len(possible)==biggestoverlap]
+
+
+def Combo(Seqslist, overlapsize):
+    while len(Seqslist) != 1:
+        #print(Seqslist)
+        for y in range(1,len(Seqslist)):
+            #print("loop2pos: ",y)
+            #conditions for allowing an overlap:
+            if len(Overlap(Seqslist[0],Seqslist[y])) > overlapsize:
+            #    print("found a good overlap! Between sequences :", Seqslist[0],Seqslist[y])
+
+            #    print("good overlap:",SuffixOverlap(Seqslist[0],Seqslist[y]))
+                Seqslist.append(SuffixOverlap(Seqslist[0],Seqslist[y]))
+            #    print("appended list with new overlap:",Seqslist)
+            #    print("removing sequences:",Seqslist[0],Seqslist[y])
+                del Seqslist[y]
+                del Seqslist[0]
+            #    print("remaining list:",Seqslist)
+                break
+            #print("length of seqsList: ",len(Seqslist))
+            if y == len(Seqslist)-1:
+                Seqslist.insert(0,Seqslist.pop())
+    return(Seqslist)
+
+
+def CommonCombo(Seqslist):
+    Commonseqs = []
+    for y in range(len(Seqslist)):
+        #print(y)
+        if y == 0:
+            Commonseqs = Commonsubs(Seqslist[y],Seqslist[y+1])
+            #print(Commonseqs)
+        else:
+            for seq in Commonseqs:
+                newcommons = Commonsubs(seq,Seqslist[y])
+                #print(newcommons)
+                #print(y)
+                if max(len(possible) for possible in newcommons) >= max(len(possible) for possible in Commonseqs):
+                    Commonseqs = newcommons
+                    #print(Commonseqs)
+    return Commonseqs
+
+#print(Commonsubs('GA','TAGACCA'))
+#print(Commonsubs('GATTACA','TAGACCA'))
+#print(Commonsubs(seqslist[3],seqslist[4]))
+#correct answer:
+#CCTGTTGCTAATTCTAAAAAGGGGCACACCGTAGGCCAGGCTGTTGAAGACCCAATACCGATGATTAGTGACTCGAGCGACGACGCGGTGGCGATCTGCAGACGCTAATGGCCACGCGATTATCTCTCGCGCGTACCAGCTACCCTCGTAATTTACCCGGGGCGCTCTCTCATTGCAGCAAGCGGATTACCAGGGGTACCTTCCCGAGTGAACACAGCTCGAGCACTGTGTGTAAGTGATGATCGCATAAACATCAGAGGCGCGCATTGCTG
+
+print(CommonCombo(seqslist))
 
 
 #This method lines up ALL POSSIBLE permutations of the given dataset and finds
