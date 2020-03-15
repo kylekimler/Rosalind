@@ -129,7 +129,7 @@ def Combo(Seqslist, overlapsize):
 
 print(*Combo(seqslist, k))
 
-def shortestCommon(Seqslist):
+#def shortestCommon(Seqslist):
 
 
 

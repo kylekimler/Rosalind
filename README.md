@@ -1,2 +1,3 @@
-I am working through problems on the website Rosalind.info
-So far, all answers are written in python.
+I am uploading all of my Rosalind.info answers to this repository. \n
+All answers are currently written in Python! \n
+
